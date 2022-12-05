@@ -1,5 +1,7 @@
 # vue-pokemon-cards-css
 
+Vue implementation of Pokémon Cards Holographic effect in CSS (from https://github.com/simeydotme/pokemon-cards-css)
+
 ## Project setup
 ```
 npm install

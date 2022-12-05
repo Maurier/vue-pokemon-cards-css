@@ -1,0 +1,39 @@
+{
+  "defaultSeverity": "warning",
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": ["node_modules/**", "**/**/*.json"]
+  },
+  "rules": {
+    "array-type": false,
+    "arrow-return-shorthand": true,
+    // enable when prettier ran a while
+    "import-spacing": false,
+    // enable later
+    "interface-name": false,
+    "jsdoc-format": false,
+    "member-access": false,
+    "member-ordering": [
+      true,
+      {
+        // let's add this gradually and for new projects
+        // "alphabetize": true,
+        "order": "fields-first"
+      }
+    ],
+    "no-consecutive-blank-lines": false,
+    "no-console": true,
+    "no-empty-interface": false,
+    "no-var-requires": false,
+    // currently errors out with vue files with more specific settings
+    // and will be a lot of manual work to adhere to. Use this for new projects though!
+    "object-literal-sort-keys": false,
+    //    "object-literal-sort-keys": [
+    //      true,
+    //      "shorthand-first",
+    //      "match-declaration-order",
+    //      "ignore-case"
+    //    ],
+    "ordered-imports": false
+  }
+}

@@ -38,7 +38,7 @@ export default class App extends Vue {
 
 <style lang="scss" scoped>
 .showcase {
-  padding: 0 4rem;
+  padding: 4rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 4rem;

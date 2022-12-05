@@ -25,16 +25,7 @@ import CardShine from '@/components/card-shine.vue';
 import CardGlare from '@/components/card-glare.vue';
 
 const galaxyPosition = Math.floor(Math.random() * 1500);
-const back_img =
-  "https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg";
-
-const getRawOrientation = function (e?) {
-  if (!e) {
-    return { alpha: 0, beta: 0, gamma: 0 };
-  } else {
-    return { alpha: e.alpha, beta: e.beta, gamma: e.gamma };
-  }
-}
+const back_img = "https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg";
 
 @Component({
   name: "card",
@@ -52,13 +43,13 @@ export default class Card extends Vue {
   @Ref('card') thisCard
   @Ref('rotator') rotator
 
-  front_img = "";
-
   private springR = { stiffness: 666, damping: 25 };
   private springD = { stiffness: 333, damping: 45 };
+
   private springRotate = useSpring({ x: 0, y: 0 }, this.springR);
   private springGlare = useSpring({ x: 50, y: 50, o: 0 }, this.springR);
   private springBackground = useSpring({ x: 50, y: 50 }, this.springR);
+
   private springRotateDelta = useSpring({ x: 0, y: 0 }, this.springD);
   private springTranslate = useSpring({ x: 0, y: 0 }, this.springD);
   private springScale = useSpring({ s: 1 }, this.springD);
@@ -66,6 +57,7 @@ export default class Card extends Vue {
   private firstPop = true;
   interacting = false;
   back_img
+  front_img = '';
 
   get styles() {
     return `
@@ -87,18 +79,6 @@ export default class Card extends Vue {
       };
     --galaxybg: center ${galaxyPosition}px;
 	  `
-  }
-
-  @Watch('active')
-  private onActiveChange(isActive, wasActive) {
-    if (isActive !== wasActive) {
-      if (isActive) {
-        this._popover()
-      }
-      else {
-        this._retreat()
-      }
-    }
   }
 
   created() {
@@ -186,8 +166,8 @@ export default class Card extends Vue {
         x: 360,
         y: 0,
       });
+      this.firstPop = false;
     }
-    this.firstPop = false;
     this.springScale.set({ s: Math.min(scaleW, scaleH, scaleF) });
     this.interactEnd(null, delay);
   }
@@ -210,6 +190,18 @@ export default class Card extends Vue {
       x: delta.x,
       y: delta.y,
     });
+  }
+
+  @Watch('active')
+  private _onActiveChange(isActive, wasActive) {
+    if (isActive !== wasActive) {
+      if (isActive) {
+        this._popover()
+      }
+      else {
+        this._retreat()
+      }
+    }
   }
 }
 </script>

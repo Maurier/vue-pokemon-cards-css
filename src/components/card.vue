@@ -1,14 +1,34 @@
 <template>
-  <div class="card" :class="{ active, interacting }" ref="card" :style="styles" :data-number="number"
-    :data-subtypes="subtypes" :data-supertype="supertype" :data-rarity="rarity" :data-gallery="gallery">
+  <div
+    class="card"
+    :class="{ active, interacting, loading }"
+    ref="card"
+    :style="styles"
+    :data-number="number"
+    :data-subtypes="subtypes"
+    :data-supertype="supertype"
+    :data-rarity="rarity"
+    :data-gallery="gallery"
+  >
     <div class="card__translater">
-      <button class="card__rotator" ref="rotator" @pointermove="interact" @mouseout="interactEnd"
-        aria-label="Expand the Pokemon Card; {name}.">
-        <img class="card__back" :src="back_img"
-          alt="The back of a Pokemon Card, a Pokeball in the center with Pokemon logo above and below" />
+      <button
+        class="card__rotator"
+        ref="rotator"
+        @pointermove="interact"
+        @mouseout="interactEnd"
+        aria-label="Expand the Pokemon Card; {name}."
+      >
+        <img
+          class="card__back"
+          :src="back_img"
+          alt="The back of a Pokemon Card, a Pokeball in the center with Pokemon logo above and below"
+        />
         <div class="card__front">
-          <img :src="front_img"
-            alt="Front design of the {name} Pokemon Card, with the stats and info around the edge" />
+          <img
+            :src="front_img"
+            v-on:load="imageLoader"
+            :alt="`Front design of the ${name} Pokemon Card, with the stats and info around the edge`"
+          />
           <card-shine :subtypes="subtypes" :supertype="supertype" />
           <card-glare :subtypes="subtypes" :rarity="rarity" />
         </div>
@@ -19,29 +39,30 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Ref, Watch } from "vue-property-decorator";
-import { useSpring } from '@vueuse/motion';
+import { useSpring } from "@vueuse/motion";
 import { clamp, round } from "@/helpers/Math";
-import CardShine from '@/components/card-shine.vue';
-import CardGlare from '@/components/card-glare.vue';
+import CardShine from "@/components/card-shine.vue";
+import CardGlare from "@/components/card-glare.vue";
 
 const galaxyPosition = Math.floor(Math.random() * 1500);
-const back_img = "https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg";
+const back_img =
+  "https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg";
 
 @Component({
   name: "card",
   components: { CardShine, CardGlare },
 })
 export default class Card extends Vue {
-  @Prop() img!: string
-  @Prop() name!: string
-  @Prop() number!: number
-  @Prop() supertype!: string
-  @Prop() subtypes!: string[]
-  @Prop() rarity!: string
-  @Prop() gallery!: boolean
-  @Prop() active!: boolean
-  @Ref('card') thisCard
-  @Ref('rotator') rotator
+  @Prop() img!: string;
+  @Prop() name!: string;
+  @Prop() number!: number;
+  @Prop() supertype!: string;
+  @Prop() subtypes!: string[];
+  @Prop() rarity!: string;
+  @Prop() gallery!: boolean;
+  @Prop() active!: boolean;
+  @Ref("card") thisCard;
+  @Ref("rotator") rotator;
 
   private springR = { stiffness: 666, damping: 25 };
   private springD = { stiffness: 333, damping: 45 };
@@ -56,8 +77,11 @@ export default class Card extends Vue {
 
   private firstPop = true;
   interacting = false;
-  back_img
-  front_img = '';
+  loading = true;
+  back_img;
+  back_loading;
+  front_loading;
+  front_img = "";
 
   get styles() {
     return `
@@ -72,24 +96,29 @@ export default class Card extends Vue {
 		--pos: ${this.springBackground.values.x}% ${this.springBackground.values.y}%;
 		--posx: ${this.springBackground.values.x}%;
 		--posy: ${this.springBackground.values.y}%;
-		--hyp: ${clamp(Math.sqrt(
-      (this.springGlare.values.y - 50) * (this.springGlare.values.y - 50) +
-      (this.springGlare.values.x - 50) * (this.springGlare.values.x - 50)
-    ) / 50, 0, 1)
-      };
+		--hyp: ${clamp(
+      Math.sqrt(
+        (this.springGlare.values.y - 50) * (this.springGlare.values.y - 50) +
+          (this.springGlare.values.x - 50) * (this.springGlare.values.x - 50)
+      ) / 50,
+      0,
+      1
+    )};
     --galaxybg: center ${galaxyPosition}px;
-	  `
+	  `;
   }
 
   created() {
-    const img_base = this.img.startsWith("http") ? "" : "https://images.pokemontcg.io/";
+    const img_base = this.img.startsWith("http")
+      ? ""
+      : "https://images.pokemontcg.io/";
     this.front_img = img_base + this.img;
-    this.back_img = back_img
+    this.back_img = back_img;
   }
 
   interact(e) {
     if (this.active) {
-      this.interacting = true
+      this.interacting = true;
     }
 
     if (e.type === "touchmove") {
@@ -131,6 +160,10 @@ export default class Card extends Vue {
       y: percent.y,
       o: 1,
     });
+  }
+
+  imageLoader() {
+    this.loading = false;
   }
 
   interactEnd(e, delay = 100) {
@@ -192,14 +225,13 @@ export default class Card extends Vue {
     });
   }
 
-  @Watch('active')
+  @Watch("active")
   private _onActiveChange(isActive, wasActive) {
     if (isActive !== wasActive) {
       if (isActive) {
-        this._popover()
-      }
-      else {
-        this._retreat()
+        this._popover();
+      } else {
+        this._retreat();
       }
     }
   }
@@ -249,6 +281,16 @@ export default class Card extends Vue {
 
     .card__rotator:focus {
       box-shadow: 0px 10px 30px 3px black;
+    }
+  }
+
+  &.loading {
+    .card__front {
+      opacity: 0;
+    }
+
+    .card__back {
+      transform: rotateY(0deg);
     }
   }
 }

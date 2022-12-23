@@ -79,6 +79,7 @@ export default class Card extends Vue {
   interacting = false;
   loading = true;
   back_img;
+  debounce;
   back_loading;
   front_loading;
   front_img = "";
@@ -114,6 +115,35 @@ export default class Card extends Vue {
       : "https://images.pokemontcg.io/";
     this.front_img = img_base + this.img;
     this.back_img = back_img;
+  }
+  mounted() {
+    window.addEventListener("scroll", this.reposition, true);
+  }
+
+  destroyed() {
+    document.removeEventListener("scroll", this.reposition);
+  }
+  reposition(e) {
+    clearTimeout(this.debounce);
+    this.debounce = setTimeout(() => {
+      if (this.active) {
+        this.setCenter();
+      }
+    }, 300);
+  }
+
+  setCenter() {
+    const rect = this.thisCard.getBoundingClientRect(); // get element's size/position
+    const view = document.documentElement; // get window/viewport size
+
+    const delta = {
+      x: round(view.clientWidth / 2 - rect.x - rect.width / 2),
+      y: round(view.clientHeight / 2 - rect.y - rect.height / 2),
+    };
+    this.springTranslate.set({
+      x: delta.x,
+      y: delta.y,
+    });
   }
 
   interact(e) {
@@ -300,6 +330,7 @@ export default class Card extends Vue {
   display: grid;
   perspective: 600px;
   transform-origin: center;
+  -webkit-transform-origin: center;
   will-change: transform;
 }
 
@@ -307,6 +338,7 @@ export default class Card extends Vue {
   width: auto;
   position: relative;
   transform: translate3d(var(--tx), var(--ty), 0) scale(var(--s));
+  -webkit-transform: translate3d(var(--tx), var(--ty), 0) scale(var(--s));
 }
 
 .card__rotator {
